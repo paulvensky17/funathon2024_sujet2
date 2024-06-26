@@ -1,11 +1,12 @@
-# setup
 
+# setup
 #install.packages("zoo")
 #install.packages("kableExtra")
 #install.packages("bslib")
 #install.packages("bsicons")
 #install.packages("fresh")
 #install.packages("shinydashboard")
+#install.packages("shinycssloaders")
 
 library(shiny)
 library(shinyWidgets)
@@ -21,6 +22,11 @@ library(DT)
 library(kableExtra)
 library(bslib)
 library(fresh)
+library(shinycssloaders)
+
+source("~/work/funathon 2024 projet 2/ui.R")
+source("~/work/funathon 2024 projet 2/server.R")
+
 source("~/work/funathon 2024 projet 2/R/create_data_list.R")
 source("~/work/funathon 2024 projet 2/R/clean_dataframe.R")
 source("~/work/funathon 2024 projet 2/R/import_data.R")
@@ -47,6 +53,26 @@ airports_location_transformed<-
   distinct(Code.OACI,.keep_all = TRUE)%>%
   select(Code.OACI,color,geometry)
 
+#####################################################################
 
+
+#shiny dashboard:
+
+## header
+header<-header
+
+#sidebar 
+sidebar <- sidebar
+
+#body
+body<-body
+
+#the whole ui 
+ui<-dashboardPage(header, sidebar, body)
+
+server<-server
+
+# Run the application 
+shinyApp(ui = ui, server = server)
 
 

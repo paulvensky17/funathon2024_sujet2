@@ -1,3 +1,21 @@
+mytheme <- create_theme(
+  adminlte_color(
+    light_blue = "#003366"
+  ),
+  adminlte_sidebar(
+    width = "400px",
+    dark_bg = "#ADD8E6",
+    light_hover_color  ="#FFA500",
+    dark_color = "#ADD8E6"
+  ),
+  adminlte_global(
+    content_bg = "#ccd6e0",
+    box_bg = "#f8f9fa", 
+    info_box_bg = "#f8f9fa"
+  )
+  
+)
+
 #ui
 
 input_date <- shinyWidgets::airDatepickerInput(
@@ -13,33 +31,74 @@ input_date <- shinyWidgets::airDatepickerInput(
 )
 
 input_aeroport<-
-  selectInput(inputId = "aeroport",label="Aéroport choisi",choices = unique(airport_all$apt_nom),selected ="PARIS-CHARLES DE GAULLE")
+  selectInput(inputId = "aeroport",label="Aéroport choisi",
+              choices = unique(airport_all$apt_nom),
+              selected ="PARIS-CHARLES DE GAULLE")
 
-#theme <- bs_theme(bg = "#6c757d", fg = "white", primary = "orange")
 
-ui<-
-  fluidPage(
-    #theme=theme,
-    theme=bs_theme(bootswatch="slate"),
-    
-    fluidRow(
+header <- dashboardHeader(
+  title=strong("Tableau de bord trafic aérien")
+)
+#########################################################################################
+
+##Objectif : elargir sidebar
+sidebar<-dashboardSidebar(
+  input_date,
+  input_aeroport
+)
+
+
+#########################################################################################
+
+body <- dashboardBody(
+  tags$head(
+    tags$style(HTML("
+      .lien-comme-bouton {
+        padding: 10px 15px;
+        background-color: #003366;
+        color: white;
+        border: none;
+        text-decoration: none;
+        margin: 5px;
+        border-radius: 5px;
+        display: inline-block;
+      }
+      .lien-comme-bouton:hover {
+        background-color: #F6B26B;
+      }
+    "))
+  ), #fin tags$head (element css)
+  use_theme(mytheme),
+  tabsetPanel(
+    tabPanel(
+      "Trafic aéroports",
       fluidRow(
-        column(10),
-        column(2,input_date)
-      ),
-      fluidRow(
-        column(6,
-               h3("Carte trafic aérien"),
-               leafletOutput("output3")),
-        column(6,
-               h3("Classement des aéroports selon la fréquentation"),
-               DTOutput("output2"))
+        column(
+          width=6,
+          box(
+            title="Carte fréquentation aéroports(mensuel)",width=NULL,solidHeader=TRUE,status="primary",leafletOutput("output3")%>%withSpinner()
+          ),
+          box(
+            title="Top 10 aéroports les plus frequentés(mensuel)",width=NULL,solidHeader=TRUE,status="primary",DTOutput("output2")%>%withSpinner()
+          )
+        ),
+        column(
+          width=6,
+          box(
+            title="Evolution du nombre de passagers par aéroport",width=NULL,solidHeader=TRUE,status="primary",plotlyOutput("output1")%>%withSpinner()
+          ),
+          box(
+            title="Evolution du volume de fret par aéroport(en tonnes)",width=NULL,solidHeader=TRUE,status="primary",plotlyOutput("output1_2")%>%withSpinner()
+          )
+        )
       )
-    ),
-    fluidRow(
-      column(2,input_aeroport),
-      column(10,
-             h3("Evolution du trafic aérien dans le temps (par aéroport)"),
-             plotlyOutput("output1"))
-    )
-  )
+      
+    ),#fin 2e panel
+    tabPanel(
+      "Trafic liaisons"
+    )#fin 3e panel (Orientation des auteurs)
+    
+    
+  ) #fin de ts les panels
+)#fin body
+

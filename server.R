@@ -21,22 +21,45 @@ server<-function(input,output,session){
     ## Graphique 1
     # Evolution traffic aérien par aeroport (passager et fret si possible)
     fig <- plot_ly(airport_traffic_passager_fret, x = ~format(as.Date(date),"%Y-%m"), y = ~`traffic_passager`, name = 'Trafic total de passagers', type = 'scatter', mode = 'lines',
-                   line = list(color = '#1C4E80', width = 4)) 
-    
-    #ajouter la seconde trace avec un axe secondaire
-    fig <- fig %>% add_trace(y = ~`traffic_fret`, name = 'Volume de fret total (en tonnes)', type = 'scatter', mode = 'lines', yaxis = 'y2',
-                             line = list(color = '#EA6A47', width = 4)) 
-    
+                   line = list(color = '#1C4E80', width = 4),text = ~paste("Periode: ", date, '<br>Voyageurs:', traffic_passager)) 
     #configuration axes
     fig<-
       fig%>%
       layout(
-        yaxis=list(title="Trafic total de passagers"),
-        yaxis2=list(
-          title="Volume de fret total (en tonnes)", 
-          overlaying="y",
-          side="right"
-        ),
+        yaxis=list(title="voyageurs"),
+        xaxis=list(
+          title="Année-Mois",
+          tickformat = "%Y-%m",
+          tickmode = "array",
+          tickvals = seq(as.Date("2018-01-01"), as.Date("2023-01-01"), by="3 month"),
+          ticktext = format(seq(as.Date("2018-01-01"), as.Date("2023-01-01"), by="3 month"), "%Y-%m"),
+          tickangle = -45,
+          tickfont = list(size=8)
+        )
+      )
+    
+    fig
+  })
+  
+  output$output1_2<-renderPlotly({
+    
+    airport_traffic_passager_fret<-
+      reactive1()%>%
+      group_by(date)%>%
+      summarize(
+        traffic_passager=sum(traffic_passager),
+        traffic_fret=sum(traffic_fret)
+      )
+    
+    ## Graphique 1
+    # Evolution traffic aérien par aeroport (passager et fret si possible)
+    fig <- plot_ly(airport_traffic_passager_fret, x = ~format(as.Date(date),"%Y-%m"), y = ~`traffic_fret`, name = "Volume de fret au départ et à l'arrivé", type = 'scatter', mode = 'lines',
+                   line = list(color = '#ADD8E6', width = 4),text = ~paste("Periode: ", date, '<br>Volume fret(tonnes):', traffic_fret)) 
+    #configuration axes
+    fig<-
+      fig%>%
+      layout(
+        yaxis=list(title="fret(en tonnes)"),
         xaxis=list(
           title="Année-Mois",
           tickformat = "%Y-%m",
